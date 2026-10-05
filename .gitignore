@@ -1,0 +1,35 @@
+# Imágenes que suben los usuarios desde la app
+# (las 10 prendas de ejemplo sí se versionan, ver php/uploads/.gitkeep)
+php/uploads/*
+!php/uploads/.gitkeep
+!php/uploads/camisa_denim.png
+!php/uploads/camiseta_negra.png
+!php/uploads/cargo_negro.png
+!php/uploads/gorra_negra.png
+!php/uploads/gorra_verde.png
+!php/uploads/jeans_azul.png
+!php/uploads/sudadera_gris.png
+!php/uploads/tenis_blancos.png
+!php/uploads/vestido_rojo.png
+!php/uploads/zapatillas_retro.png
+
+# Firebase CLI
+firebase/.firebase/
+firebase/*-debug.log
+.firebase-debug.log
+firebase-debug.log
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*~

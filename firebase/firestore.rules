@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cambia este correo por el del administrador principal (el mismo que en index.html)
+    function isMainAdmin() {
+      return request.auth != null && request.auth.token.email in ['admin@vtryon.com'];
+    }
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return isMainAdmin() || (signedIn()
+        && exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+
+    // Tiendas: todos las ven, solo el admin las administra
+    match /stores/{storeId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Catálogo: todos lo ven, solo el admin lo modifica
+    match /garments/{garmentId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Ajustes de la tienda: todos los leen, solo el admin los cambia
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Perfiles: cada quien ve y edita el suyo, sin poder cambiarse el rol
+    match /users/{uid} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if signedIn() && request.auth.uid == uid
+        && (request.resource.data.role == 'user' || isMainAdmin());
+      allow update: if isAdmin()
+        || (signedIn() && request.auth.uid == uid
+            && request.resource.data.role == resource.data.role);
+      allow delete: if isAdmin();
+    }
+
+    // Historial de pruebas
+    match /tryons/{tryonId} {
+      allow create: if signedIn() && request.resource.data.userId == request.auth.uid;
+      allow read, delete: if signedIn() && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+  }
+}
